@@ -3,13 +3,71 @@
 // State Management
 let currentTab = 'engineering';
 const contentCache = {};
+let lenis = null;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    initLenis();
     loadTab('engineering');
     initParticles();
     animate();
 });
+
+function initLenis() {
+    if (typeof Lenis === 'undefined') return;
+
+    lenis = new Lenis({
+        duration: 1.1,
+        orientation: 'vertical',
+        gestureOrientation: 'vertical',
+        smoothWheel: true,
+        syncTouch: true,
+        syncTouchLerp: 0.1,
+        touchMultiplier: 1.2
+    });
+
+    function raf(time) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+}
+
+function getYouTubeVideoId(url) {
+    try {
+        const parsed = new URL(url);
+        const host = parsed.hostname.replace('www.', '');
+
+        if (host === 'youtu.be') return parsed.pathname.slice(1).split('/')[0];
+        if (parsed.pathname.startsWith('/shorts/')) return parsed.pathname.split('/')[2] || '';
+        return parsed.searchParams.get('v') || '';
+    } catch {
+        return '';
+    }
+}
+
+function getYouTubeThumbnail(url, quality = 'hqdefault') {
+    const videoId = getYouTubeVideoId(url);
+    if (!videoId) return '';
+    return `https://img.youtube.com/vi/${videoId}/${quality}.jpg`;
+}
+
+function hydrateYouTubeCovers(root = document) {
+    const containers = root.querySelectorAll('.video-container[data-youtube-url]');
+
+    containers.forEach(container => {
+        const videoUrl = container.dataset.youtubeUrl || '';
+        const videoTitle = container.dataset.videoTitle || 'Video';
+        const thumbnailUrl = getYouTubeThumbnail(videoUrl);
+
+        if (thumbnailUrl) {
+            container.innerHTML = `<img src="${thumbnailUrl}" alt="${videoTitle} video cover" class="video-cover">`;
+        } else {
+            container.innerHTML = '<div class="video-cover video-cover-fallback">Preview Unavailable</div>';
+        }
+    });
+}
 
 // Core Tab Switching Logic
 async function loadTab(tabName) {
@@ -39,6 +97,8 @@ async function loadTab(tabName) {
         }
     }
 
+    hydrateYouTubeCovers(container);
+
     // 3. Handle Animation Visibility
     const canvas = document.getElementById('render-canvas');
     if (tabName === 'renders') {
@@ -50,7 +110,8 @@ async function loadTab(tabName) {
         // but css handles visibility.
     }
     
-    window.scrollTo(0, 0);
+    if (lenis) lenis.scrollTo(0, { immediate: true });
+    else window.scrollTo(0, 0);
 }
 
 // Global scope for HTML onclick
