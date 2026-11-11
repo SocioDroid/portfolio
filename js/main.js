@@ -1,177 +1,181 @@
-/* js/main.js */
+/* js/main.js — Theme, tab routing, reveal animations and the lazy-loaded
+   WebGL backdrop. Content comes from js/data.js via js/render.js. */
 
-// Smooth scroll (Lenis)
-const lenis = new Lenis({ duration: 1.2, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
-(function raf(time) { lenis.raf(time); requestAnimationFrame(raf); })(performance.now());
-
-// State Management
-let currentTab = 'engineering';
-
-// Renderers keyed by tab name
-const tabRenderers = {
-    engineering: () => Render.engineering(PORTFOLIO),
-    exploits:    () => Render.exploits(PORTFOLIO),
-    renders:     () => Render.renders(PORTFOLIO)
-};
-
-// ─── Theme Toggle ───
-
-function initThemeToggle() {
-    const btn = document.getElementById('theme-toggle');
-    if (!btn) return;
-    const icon = btn.querySelector('i');
-
-    // Dark is default (applied by inline script in HTML).
-    // If user explicitly chose light, revert.
-    const saved = localStorage.getItem('theme');
-    if (saved === 'light') {
-        document.body.classList.remove('dark-mode');
-        icon.classList.replace('fa-sun', 'fa-moon');
-    } else if (!saved) {
-        localStorage.setItem('theme', 'dark');
-    }
-
-    btn.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        const isDark = document.body.classList.contains('dark-mode');
-        icon.classList.replace(isDark ? 'fa-moon' : 'fa-sun', isDark ? 'fa-sun' : 'fa-moon');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    });
-}
-
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    initThemeToggle();
-
-    document.querySelector('.title-bar').innerHTML = Render.header(PORTFOLIO);
-    document.querySelector('.mobile-nav').innerHTML = Render.mobileNav(PORTFOLIO);
-
-    loadTab('engineering');
-});
-
-function getYouTubeVideoId(url) {
-    try {
-        const parsed = new URL(url);
-        const host = parsed.hostname.replace('www.', '');
-
-        if (host === 'youtu.be') return parsed.pathname.slice(1).split('/')[0];
-        if (parsed.pathname.startsWith('/shorts/')) return parsed.pathname.split('/')[2] || '';
-        return parsed.searchParams.get('v') || '';
-    } catch {
-        return '';
-    }
-}
-
-function getYouTubeThumbnail(url, quality = 'hqdefault') {
-    const videoId = getYouTubeVideoId(url);
-    if (!videoId) return '';
-    return `https://img.youtube.com/vi/${videoId}/${quality}.jpg`;
-}
-
-function hydrateYouTubeCovers(root = document) {
-    const containers = root.querySelectorAll('.video-container[data-youtube-url]');
-
-    containers.forEach(container => {
-        const videoUrl = container.dataset.youtubeUrl || '';
-        const videoTitle = container.dataset.videoTitle || 'Video';
-        const thumbnailUrl = getYouTubeThumbnail(videoUrl);
-
-        if (thumbnailUrl) {
-            container.innerHTML = `<img src="${thumbnailUrl}" alt="${videoTitle} cover" class="video-cover" loading="lazy">`;
-        } else {
-            container.innerHTML = '<div class="video-cover video-cover-fallback">Preview Unavailable</div>';
-        }
-    });
-}
-
-// Core Tab Switching Logic
-function loadTab(tabName) {
-    const container = document.getElementById('main-content');
+(() => {
+    const root = document.documentElement;
+    const main = document.getElementById('main');
     const glCanvas = document.getElementById('renders-gl-canvas');
+    const tabs = PORTFOLIO.tabs;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Cleanup previous tab's WebGL
-    if (currentTab === 'renders' && typeof RendersGL !== 'undefined') {
-        RendersGL.stop();
-        container.removeEventListener('mousemove', RendersGL.onMouseMove);
-        if (window._rendersScrollHandler) {
-            window.removeEventListener('scroll', window._rendersScrollHandler);
-            window._rendersScrollHandler = null;
+    let currentTab = null;
+
+    // ─── Theme ───
+
+    function applyTheme(theme, persist) {
+        root.dataset.theme = theme;
+        if (persist) {
+            try { localStorage.setItem('theme', theme); } catch { /* private mode */ }
         }
+        const meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.content = theme === 'dark' ? '#0b0c0e' : '#fafaf9';
+        document.querySelectorAll('[data-theme-toggle]').forEach(btn => {
+            btn.setAttribute('aria-pressed', String(theme === 'dark'));
+        });
     }
 
-    currentTab = tabName;
+    function initTheme() {
+        applyTheme(root.dataset.theme || 'dark', false);
 
-    // 1. UI Updates
-    document.querySelectorAll('.nav-item').forEach(el => {
-        if (el.dataset.tab === tabName) el.classList.add('active');
-        else el.classList.remove('active');
-    });
-
-    // 2. Content Injection (data-driven, no fetch needed)
-    const renderer = tabRenderers[tabName];
-
-    if (renderer) {
-        container.innerHTML = renderer();
-    } else {
-        container.innerHTML = `<div class="brutal-box"><h3>Error</h3><p>Unknown tab: ${tabName}</p></div>`;
-    }
-
-    hydrateYouTubeCovers(container);
-    observeReveals(container);
-
-    // 3. Handle WebGL Visibility
-    if (tabName === 'renders') {
-        glCanvas.style.opacity = '1';
-
-        requestAnimationFrame(() => {
-            if (typeof RendersGL !== 'undefined') {
-                RendersGL.start();
-                container.addEventListener('mousemove', RendersGL.onMouseMove);
-            }
+        document.addEventListener('click', e => {
+            if (!e.target.closest('[data-theme-toggle]')) return;
+            applyTheme(root.dataset.theme === 'dark' ? 'light' : 'dark', true);
         });
 
-        // Scroll → Saturn zoom + blur: feed scroll progress to WebGL, blur when content overlaps
-        window._rendersScrollHandler = () => {
-            const scrollTop = window.scrollY || document.documentElement.scrollTop;
-            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-            if (docHeight > 0) {
-                const progress = scrollTop / docHeight;
-                if (typeof RendersGL !== 'undefined') RendersGL.setScroll(progress);
-                // Blur fades from max at top (content overlapping) to 0 at bottom (saturn alone)
-                const blur = Math.max(0, (1 - progress) * 6);
-                glCanvas.style.filter = blur > 0.1 ? `blur(${blur.toFixed(1)}px)` : 'none';
-            }
-        };
-        window._rendersScrollHandler(); // set initial blur
-        window.addEventListener('scroll', window._rendersScrollHandler, { passive: true });
-    } else {
-        glCanvas.style.opacity = '0';
+        // Follow the system setting until the visitor makes an explicit choice
+        window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', e => {
+            let saved = null;
+            try { saved = localStorage.getItem('theme'); } catch { /* ignore */ }
+            if (!saved) applyTheme(e.matches ? 'light' : 'dark', false);
+        });
+    }
+
+    // ─── Reveal on scroll ───
+
+    const revealObserver = 'IntersectionObserver' in window && !reducedMotion
+        ? new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('visible');
+                revealObserver.unobserve(entry.target);
+            });
+        }, { threshold: 0.08, rootMargin: '0px 0px -5% 0px' })
+        : null;
+
+    function observeReveals(scope) {
+        scope.querySelectorAll('.reveal').forEach(el => {
+            if (revealObserver) revealObserver.observe(el);
+            else el.classList.add('visible');
+        });
+    }
+
+    // ─── WebGL backdrop (Renders tab only; scripts are fetched on first use) ───
+
+    let glScripts = null;
+    let scrollTicking = false;
+
+    function loadScript(src) {
+        return new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = src;
+            s.onload = resolve;
+            s.onerror = reject;
+            document.head.appendChild(s);
+        });
+    }
+
+    function loadGL() {
+        glScripts = glScripts || loadScript('js/vendor/gl-matrix-min.js')
+            .then(() => loadScript('js/renders-webgl.js'));
+        return glScripts;
+    }
+
+    // Scroll → Saturn zoom, plus a blur that fades out as the content scrolls away
+    function updateScroll() {
+        scrollTicking = false;
+        if (currentTab !== 'renders' || typeof RendersGL === 'undefined') return;
+        const range = root.scrollHeight - window.innerHeight;
+        const progress = range > 0 ? Math.min(1, window.scrollY / range) : 0;
+        RendersGL.setScroll(progress);
+        const blur = (1 - progress) * 6;
+        glCanvas.style.filter = blur > 0.1 ? `blur(${blur.toFixed(1)}px)` : 'none';
+    }
+
+    function onScroll() {
+        if (scrollTicking) return;
+        scrollTicking = true;
+        requestAnimationFrame(updateScroll);
+    }
+
+    function onMouseMove(e) {
+        if (typeof RendersGL !== 'undefined') RendersGL.onMouseMove(e);
+    }
+
+    function startGL() {
+        loadGL().then(() => {
+            if (currentTab !== 'renders' || document.hidden) return;
+            RendersGL.start();
+            glCanvas.classList.add('is-active');
+            updateScroll();
+        }).catch(() => { /* backdrop is decorative; the page works without it */ });
+
+        main.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('scroll', onScroll, { passive: true });
+    }
+
+    function stopGL() {
+        if (typeof RendersGL !== 'undefined') RendersGL.stop();
+        glCanvas.classList.remove('is-active');
         glCanvas.style.filter = 'none';
-        // Remove scroll handler when leaving renders tab
-        if (window._rendersScrollHandler) {
-            window.removeEventListener('scroll', window._rendersScrollHandler);
-            window._rendersScrollHandler = null;
+        main.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('scroll', onScroll);
+    }
+
+    // Don't burn GPU while the tab is in the background
+    document.addEventListener('visibilitychange', () => {
+        if (currentTab !== 'renders' || typeof RendersGL === 'undefined') return;
+        if (document.hidden) RendersGL.stop();
+        else RendersGL.start();
+    });
+
+    // ─── Tabs (hash-routed, so each section is linkable) ───
+
+    function tabFromHash() {
+        const name = location.hash.slice(1).toLowerCase();
+        return tabs.includes(name) ? name : tabs[0];
+    }
+
+    function loadTab(name) {
+        if (name === currentTab) return;
+        if (currentTab === 'renders') stopGL();
+
+        const isFirstLoad = currentTab === null;
+        currentTab = name;
+        document.body.dataset.tab = name;
+
+        document.querySelectorAll('[data-tab]').forEach(el => {
+            if (el.dataset.tab === name) el.setAttribute('aria-current', 'page');
+            else el.removeAttribute('aria-current');
+        });
+
+        main.innerHTML = Render[name](PORTFOLIO);
+        observeReveals(main);
+
+        const label = name.charAt(0).toUpperCase() + name.slice(1);
+        document.title = name === tabs[0]
+            ? PORTFOLIO.personal.pageTitle
+            : `${label} | ${PORTFOLIO.personal.name}`;
+
+        if (name === 'renders') startGL();
+
+        if (!isFirstLoad) {
+            window.scrollTo(0, 0);
+            main.focus({ preventScroll: true });
         }
     }
-    
-    lenis.scrollTo(0, { immediate: true });
-}
 
-// Global scope for HTML onclick
-window.switchTab = function(tabName) {
-    loadTab(tabName);
-}
+    // Hide thumbnails that fail to load (the card keeps its neutral placeholder)
+    main.addEventListener('error', e => {
+        if (e.target.tagName === 'IMG') e.target.remove();
+    }, true);
 
-// Lightweight reveal: IntersectionObserver for .reveal elements
-const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-        if (e.isIntersecting) {
-            e.target.classList.add('visible');
-            revealObserver.unobserve(e.target);
-        }
-    });
-}, { threshold: 0.1 });
+    // ─── Init ───
 
-function observeReveals(root) {
-    root.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-}
+    document.querySelector('.site-header').innerHTML = Render.header(PORTFOLIO);
+    document.querySelector('.mobile-nav').innerHTML = Render.mobileNav(PORTFOLIO);
+    document.querySelector('.site-footer').innerHTML = Render.footer(PORTFOLIO);
+
+    initTheme();
+    loadTab(tabFromHash());
+    window.addEventListener('hashchange', () => loadTab(tabFromHash()));
+})();

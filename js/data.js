@@ -9,6 +9,7 @@ const PORTFOLIO = {
         location: "Pune, IN",
         email: "aishkendle6999@gmail.com",
         pageTitle: "Aishwarya | Engineering & Security",
+        tagline: "Software engineer, security researcher and graphics programmer.",
         resumeUrl: ""
     },
 
@@ -25,28 +26,39 @@ const PORTFOLIO = {
 
         techStack: {
             languages: [
-                { icon: "fab fa-cuttlefish", title: "C#" },
-                { icon: "fab fa-python", title: "Python" },
-                { icon: "fab fa-js", title: "JavaScript" },
-                { icon: "fas fa-database", title: "SQL / NoSQL" }
+                { title: "C#" },
+                { title: "Python" },
+                { title: "JavaScript" },
+                { title: "SQL / NoSQL" }
             ],
             frameworks: [
-                { icon: "fab fa-microsoft", title: ".NET Core" },
-                { icon: "fab fa-angular", title: "Angular" },
-                { icon: "fab fa-react", title: "React" },
-                { icon: "fab fa-node", title: "Node.js" }
+                { title: ".NET Core" },
+                { title: "Angular" },
+                { title: "React" },
+                { title: "Node.js" }
             ],
             tools: [
-                { icon: "fab fa-docker", title: "Docker" },
-                { icon: "fab fa-git-alt", title: "Git" },
-                { icon: "fas fa-cloud", title: "Azure" }
+                { title: "Docker" },
+                { title: "Git" },
+                { title: "Azure" }
             ]
         },
 
+        // `role` and `period` are optional. Highlights may contain inline HTML.
         experience: [
             {
+                company: "Pearl",
+                role: "Software Engineer II · JustAnswer team",
+                period: "Present", // TODO: add start date, e.g. "Mon YYYY - Present"
+                highlights: [
+                    'Full-stack engineering on the JustAnswer team.',
+                    'Built two hackathon projects.'
+                ]
+            },
+            {
                 company: "Arctera (Veritas)",
-                period: "Nov 2024 - Present",
+                role: "Software Engineer",
+                period: "From Nov 2024", // TODO: add end date
                 highlights: [
                     'Optimized real-time analytics dashboards, boosting system monitoring efficiency by 35%.',
                     'Boosted server performance by 30% via dynamic context updates.',
@@ -98,10 +110,15 @@ const PORTFOLIO = {
     // ─── Exploits Tab ───
     exploits: {
 
+        header: {
+            title: "Security Research",
+            subtitle: "Bug Bounty & Responsible Disclosure"
+        },
+
         profiles: [
             { name: "HackerOne", url: "https://hackerone.com/aishkendle" },
             { name: "Bugcrowd", url: "https://bugcrowd.com/AishKendle" },
-            { name: "Synack", url: "https://acropolis.synack.com/inductees/aish", icon: "fas fa-shield-alt" }
+            { name: "Synack", url: "https://acropolis.synack.com/inductees/aish" }
         ],
 
         hallOfFame: [
@@ -122,11 +139,11 @@ const PORTFOLIO = {
         ],
 
         writeups: [
-            { platform: "fas fa-file-invoice", title: "Lark Technologies: Improper Access Control", url: "https://hackerone.com/reports/1470076" },
-            { platform: "fas fa-file-invoice", title: "Stripo: Password token leak via Host header", url: "https://hackerone.com/reports/737042" },
-            { platform: "fas fa-file-invoice", title: "Stripo: OLD SESSION DOES NOT EXPIRE AFTER PASSWORD CHANGE", url: "https://hackerone.com/reports/737039" },
-            { platform: "fas fa-file-invoice", title: "Stripo: Bypass email verification and create email template with the editor", url: "https://hackerone.com/reports/737169" },
-            { platform: "fab fa-medium", title: "How we Hijacked 26+ Subdomains", url: "https://medium.com/@aishwaryakendle/how-we-hijacked-26-subdomains-9c05c94c7049" }
+            { platform: "hackerone", title: "Lark Technologies: Improper Access Control", url: "https://hackerone.com/reports/1470076" },
+            { platform: "hackerone", title: "Stripo: Password token leak via Host header", url: "https://hackerone.com/reports/737042" },
+            { platform: "hackerone", title: "Stripo: OLD SESSION DOES NOT EXPIRE AFTER PASSWORD CHANGE", url: "https://hackerone.com/reports/737039" },
+            { platform: "hackerone", title: "Stripo: Bypass email verification and create email template with the editor", url: "https://hackerone.com/reports/737169" },
+            { platform: "medium", title: "How we Hijacked 26+ Subdomains", url: "https://medium.com/@aishwaryakendle/how-we-hijacked-26-subdomains-9c05c94c7049" }
         ],
 
         talks: [
