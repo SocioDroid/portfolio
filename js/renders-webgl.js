@@ -412,7 +412,7 @@ const RendersGL = (() => {
 
         const { mat4, mat3 } = glMatrix;
         const t = (performance.now() - startTime) * 0.001;
-        const isDark = document.body.classList.contains('dark-mode');
+        const isDark = document.documentElement.dataset.theme === 'dark';
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
         const vw = canvas.width / dpr;
         const isMobile = vw < 600;
@@ -535,7 +535,7 @@ const RendersGL = (() => {
     function start() {
         if (!gl && !init()) return;
         // Reset smooth values to prevent jump on tab switch
-        const isDark = document.body.classList.contains('dark-mode');
+        const isDark = document.documentElement.dataset.theme === 'dark';
         scrollProgress = 0;
         smoothScroll = 0;
         mouseX = 0.5; mouseY = 0.5;

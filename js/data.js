@@ -9,6 +9,7 @@ const PORTFOLIO = {
         location: "Pune, IN",
         email: "aishkendle6999@gmail.com",
         pageTitle: "Aishwarya | Engineering & Security",
+        tagline: "Software engineer, security researcher and graphics programmer.",
         resumeUrl: ""
     },
 
@@ -25,33 +26,42 @@ const PORTFOLIO = {
 
         techStack: {
             languages: [
-                { icon: "fab fa-cuttlefish", title: "C#" },
-                { icon: "fab fa-python", title: "Python" },
-                { icon: "fab fa-js", title: "JavaScript" },
-                { icon: "fas fa-database", title: "SQL / NoSQL" }
+                { title: "C#" },
+                { title: "Python" },
+                { title: "JavaScript" },
+                { title: "SQL / NoSQL" }
             ],
             frameworks: [
-                { icon: "fab fa-microsoft", title: ".NET Core" },
-                { icon: "fab fa-angular", title: "Angular" },
-                { icon: "fab fa-react", title: "React" },
-                { icon: "fab fa-node", title: "Node.js" }
+                { title: ".NET Core" },
+                { title: "Angular" },
+                { title: "React" },
+                { title: "Node.js" }
             ],
             tools: [
-                { icon: "fab fa-docker", title: "Docker" },
-                { icon: "fab fa-git-alt", title: "Git" },
-                { icon: "fas fa-cloud", title: "Azure" }
+                { title: "Docker" },
+                { title: "Git" },
+                { title: "Azure" }
             ]
         },
 
+        // `role`, `period` and `highlights` are optional. Highlights may contain inline HTML.
         experience: [
             {
-                company: "Arctera (Veritas)",
-                period: "Nov 2024 - Present",
+                company: "Pearl",
+                role: "Software Engineer II",
+                period: "Apr 2026 - Present"
+            },
+            {
+                company: "Arctera.io",
+                role: "Software Engineer",
+                period: "Dec 2024 - Apr 2026",
                 highlights: [
-                    'Optimized real-time analytics dashboards, boosting system monitoring efficiency by 35%.',
-                    'Boosted server performance by 30% via dynamic context updates.',
-                    'Optimized retrieval from <strong>11 data centers</strong> by 40%.',
-                    '🏆 Winner: Innovate 2025 Hackathon.'
+                    'Integrated OpenAI GPT-4.1 (1M token context) into InsightAI, enabling richer document-aware AI workflows.',
+                    'Built optimized context generation & caching microservices, cutting response time by 40% and improving server performance by 30%.',
+                    'Developed a SharePoint archiving & rehydration POC, reducing customer storage usage by 50%.',
+                    'Led migration from a custom Angular UI framework to Angular Material, improving UI consistency, theming, and frontend performance.',
+                    'Enhanced real-time analytics dashboards and built data aggregation services across <strong>11 data centers</strong>, reducing data retrieval time by 40%.',
+                    '🏆 Winner – Arctera Insight Innovate 2025 Hackathon, delivering real-time user behavior tracking and insights for data center automation.'
                 ]
             },
             {
@@ -98,10 +108,15 @@ const PORTFOLIO = {
     // ─── Exploits Tab ───
     exploits: {
 
+        header: {
+            title: "Security Research",
+            subtitle: "Bug Bounty & Responsible Disclosure"
+        },
+
         profiles: [
             { name: "HackerOne", url: "https://hackerone.com/aishkendle" },
             { name: "Bugcrowd", url: "https://bugcrowd.com/AishKendle" },
-            { name: "Synack", url: "https://acropolis.synack.com/inductees/aish", icon: "fas fa-shield-alt" }
+            { name: "Synack", url: "https://acropolis.synack.com/inductees/aish" }
         ],
 
         hallOfFame: [
@@ -122,11 +137,11 @@ const PORTFOLIO = {
         ],
 
         writeups: [
-            { platform: "fas fa-file-invoice", title: "Lark Technologies: Improper Access Control", url: "https://hackerone.com/reports/1470076" },
-            { platform: "fas fa-file-invoice", title: "Stripo: Password token leak via Host header", url: "https://hackerone.com/reports/737042" },
-            { platform: "fas fa-file-invoice", title: "Stripo: OLD SESSION DOES NOT EXPIRE AFTER PASSWORD CHANGE", url: "https://hackerone.com/reports/737039" },
-            { platform: "fas fa-file-invoice", title: "Stripo: Bypass email verification and create email template with the editor", url: "https://hackerone.com/reports/737169" },
-            { platform: "fab fa-medium", title: "How we Hijacked 26+ Subdomains", url: "https://medium.com/@aishwaryakendle/how-we-hijacked-26-subdomains-9c05c94c7049" }
+            { platform: "hackerone", title: "Lark Technologies: Improper Access Control", url: "https://hackerone.com/reports/1470076" },
+            { platform: "hackerone", title: "Stripo: Password token leak via Host header", url: "https://hackerone.com/reports/737042" },
+            { platform: "hackerone", title: "Stripo: OLD SESSION DOES NOT EXPIRE AFTER PASSWORD CHANGE", url: "https://hackerone.com/reports/737039" },
+            { platform: "hackerone", title: "Stripo: Bypass email verification and create email template with the editor", url: "https://hackerone.com/reports/737169" },
+            { platform: "medium", title: "How we Hijacked 26+ Subdomains", url: "https://medium.com/@aishwaryakendle/how-we-hijacked-26-subdomains-9c05c94c7049" }
         ],
 
         talks: [

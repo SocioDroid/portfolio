@@ -3,46 +3,57 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Aishwarya | Engineering & Security</title>
+    <meta name="description"
+        content="Aishwarya Kendle — software engineer, security researcher and graphics programmer based in Pune, India.">
+    <meta name="theme-color" content="#0b0c0e">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Aishwarya Kendle | Engineering & Security">
+    <meta property="og:description"
+        content="Software engineering, security research and real-time graphics by Aishwarya Kendle.">
+    <meta property="og:url" content="https://aishkendle.dev/">
+    <link rel="canonical" href="https://aishkendle.dev/">
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0c0e'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' font-size='15' fill='%234fd1b8'%3EAK%3C/text%3E%3C/svg%3E">
+
+    <!-- Apply the saved (or system) theme before first paint to avoid a flash -->
+    <script>
+        (function () {
+            var t;
+            try { t = localStorage.getItem('theme'); } catch (e) { }
+            if (t !== 'light' && t !== 'dark') {
+                t = window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+            }
+            document.documentElement.dataset.theme = t;
+        })();
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <script src="https://unpkg.com/lenis@1/dist/lenis.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gl-matrix@3.4.3/gl-matrix-min.js"></script>
+
+    <script src="js/data.js" defer></script>
+    <script src="js/render.js" defer></script>
+    <script src="js/main.js" defer></script>
 </head>
 
 <body>
+    <a class="skip-link" href="#main">Skip to content</a>
 
-    <!-- Prevent white flash: apply dark mode before paint -->
-    <script>
-        if (localStorage.getItem('theme') !== 'light') document.body.classList.add('dark-mode');
-    </script>
+    <!-- Saturn backdrop for the Renders tab (WebGL is loaded on demand) -->
+    <canvas id="renders-gl-canvas" aria-hidden="true"></canvas>
 
-    <canvas id="renders-gl-canvas"></canvas>
+    <!-- Everything below is rendered from js/data.js -->
+    <header class="site-header"></header>
+    <main id="main" class="container" tabindex="-1"></main>
+    <footer class="site-footer"></footer>
+    <nav class="mobile-nav" aria-label="Sections"></nav>
 
-    <!-- Header: rendered dynamically from js/data.js -->
-    <header class="title-bar"></header>
-
-    <div id="main-content" class="container">
-    </div>
-
-    <!-- Mobile nav: rendered dynamically from js/data.js -->
-    <nav class="mobile-nav"></nav>
-
-    <!-- Theme toggle -->
-    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
-        <i class="fas fa-sun"></i>
-    </button>
-
-    <script src="js/data.js"></script>
-    <script src="js/render.js"></script>
-    <script src="js/renders-webgl.js"></script>
-    <script src="js/main.js"></script>
+    <noscript>
+        <p class="noscript">This portfolio needs JavaScript to render its content.</p>
+    </noscript>
 </body>
 
 </html>
