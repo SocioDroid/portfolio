@@ -44,26 +44,24 @@ const PORTFOLIO = {
             ]
         },
 
-        // `role` and `period` are optional. Highlights may contain inline HTML.
+        // `role`, `period` and `highlights` are optional. Highlights may contain inline HTML.
         experience: [
             {
                 company: "Pearl",
-                role: "Software Engineer II · JustAnswer team",
-                period: "Present", // TODO: add start date, e.g. "Mon YYYY - Present"
-                highlights: [
-                    'Full-stack engineering on the JustAnswer team.',
-                    'Built two hackathon projects.'
-                ]
+                role: "Software Engineer II",
+                period: "Apr 2026 - Present"
             },
             {
-                company: "Arctera (Veritas)",
+                company: "Arctera.io",
                 role: "Software Engineer",
-                period: "From Nov 2024", // TODO: add end date
+                period: "Dec 2024 - Apr 2026",
                 highlights: [
-                    'Optimized real-time analytics dashboards, boosting system monitoring efficiency by 35%.',
-                    'Boosted server performance by 30% via dynamic context updates.',
-                    'Optimized retrieval from <strong>11 data centers</strong> by 40%.',
-                    '🏆 Winner: Innovate 2025 Hackathon.'
+                    'Integrated OpenAI GPT-4.1 (1M token context) into InsightAI, enabling richer document-aware AI workflows.',
+                    'Built optimized context generation & caching microservices, cutting response time by 40% and improving server performance by 30%.',
+                    'Developed a SharePoint archiving & rehydration POC, reducing customer storage usage by 50%.',
+                    'Led migration from a custom Angular UI framework to Angular Material, improving UI consistency, theming, and frontend performance.',
+                    'Enhanced real-time analytics dashboards and built data aggregation services across <strong>11 data centers</strong>, reducing data retrieval time by 40%.',
+                    '🏆 Winner – Arctera Insight Innovate 2025 Hackathon, delivering real-time user behavior tracking and insights for data center automation.'
                 ]
             },
             {

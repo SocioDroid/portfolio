@@ -223,9 +223,10 @@ const Render = (() => {
                     </div>
                     ${exp.period ? `<span class="period">${esc(exp.period)}</span>` : ''}
                 </div>
+                ${exp.highlights && exp.highlights.length ? `
                 <ul class="bullets">
                     ${exp.highlights.map(h => `<li>${h}</li>`).join('')}
-                </ul>
+                </ul>` : ''}
             </div>
         </li>`).join('')}
     </ol>`);

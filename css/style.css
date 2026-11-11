@@ -496,7 +496,10 @@ a.meta-item:hover {
     align-items: baseline;
     justify-content: space-between;
     gap: 4px 16px;
-    margin-bottom: 12px;
+}
+
+.exp-head + .bullets {
+    margin-top: 12px;
 }
 
 h3 {
